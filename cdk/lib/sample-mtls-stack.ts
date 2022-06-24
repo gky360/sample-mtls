@@ -19,15 +19,15 @@ export class SampleMtlsStack extends Stack {
 
     const { certificateArn, domainName, resourceNamePrefix } = props;
 
-    const certificate = acm.Certificate.fromCertificateArn(
-      this,
-      'Certificate',
-      certificateArn
-    );
+    // const certificate = acm.Certificate.fromCertificateArn(
+    //   this,
+    //   'Certificate',
+    //   certificateArn
+    // );
 
-    const s3CertificateBucket = new s3.Bucket(this, 'Certificate', {
-      bucketName: `${resourceNamePrefix}-certificate`,
-    });
+    // const s3CertificateBucket = new s3.Bucket(this, 'Certificate', {
+    //   bucketName: `${resourceNamePrefix}-certificate`,
+    // });
 
     const logGroup = new logs.LogGroup(this, 'ProductApiAccessLogGroup', {
       logGroupName: `/aws/apigateway/${resourceNamePrefix}-api`,
@@ -59,10 +59,17 @@ export class SampleMtlsStack extends Stack {
     });
 
     const mockIntegration = new apigw.MockIntegration({
-      integrationResponses: [{ statusCode: '200' }],
+      integrationResponses: [
+        {
+          statusCode: '200',
+          responseTemplates: {
+            'application/json': JSON.stringify({ message: 'ok' }),
+          },
+        },
+      ],
       passthroughBehavior: apigw.PassthroughBehavior.NEVER,
       requestTemplates: {
-        'application/json': '{ "statusCode": 200 }',
+        'application/json': JSON.stringify({ statusCode: 200 }),
       },
     });
 
