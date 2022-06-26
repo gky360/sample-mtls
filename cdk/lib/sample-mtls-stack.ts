@@ -36,13 +36,17 @@ export class SampleMtlsStack extends Stack {
       encryptionKey: s3KmsKey,
     });
 
-    new s3deploy.BucketDeployment(this, 'CertificateDeployment', {
-      sources: [
-        s3deploy.Source.asset(path.join(__dirname, '../data/certificate')),
-      ],
-      destinationBucket: certificateBucket,
-      destinationKeyPrefix: domainName,
-    });
+    const certificateDeployment = new s3deploy.BucketDeployment(
+      this,
+      'CertificateDeployment',
+      {
+        sources: [
+          s3deploy.Source.asset(path.join(__dirname, '../data/certificate')),
+        ],
+        destinationBucket: certificateBucket,
+        destinationKeyPrefix: domainName,
+      }
+    );
 
     const logGroup = new logs.LogGroup(this, 'ProductApiAccessLogGroup', {
       logGroupName: `/aws/apigateway/${resourceNamePrefix}-api`,
@@ -65,7 +69,7 @@ export class SampleMtlsStack extends Stack {
         endpointType: apigw.EndpointType.REGIONAL,
         securityPolicy: apigw.SecurityPolicy.TLS_1_2,
         mtls: {
-          bucket: certificateBucket,
+          bucket: certificateDeployment.deployedBucket,
           key: `${domainName}/truststore.pem`,
         },
       },
