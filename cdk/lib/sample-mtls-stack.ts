@@ -74,7 +74,7 @@ export class SampleMtlsStack extends Stack {
         },
       },
       // Disable `execute-api` endpoint to ensure that clients can access the API only by using a custom domain name with mutual TLS.
-      // disableExecuteApiEndpoint: true,
+      disableExecuteApiEndpoint: true,
     });
 
     const mockIntegration = new apigw.MockIntegration({
